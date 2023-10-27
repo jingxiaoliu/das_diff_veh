@@ -9,6 +9,7 @@ import math
 import scipy
 import time
 import datetime
+import cv2 as cv
 
 
 from scipy.interpolate import interp1d
@@ -602,3 +603,11 @@ def upload_to_oas(oas_dir, local_path):
     os.system(cmd)
     if not flag:
         os.remove(local_path)
+
+def fv_map_enhance(fv_map):   
+    fv_map = (fv_map-np.min(fv_map)) / np.max(fv_map)
+    fv_map = np.array(fv_map * 255, dtype = np.uint8)
+    clahe = cv.createCLAHE(clipLimit=100.0, tileGridSize=(100,10))
+    fv_map_enhanced = clahe.apply(fv_map)
+    fv_map_enhanced = cv.blur(fv_map_enhanced,(10,10))
+    return fv_map_enhanced

@@ -9,7 +9,7 @@ from scipy import interpolate
 import scipy
 
 from apis.data_classes import SurfaceWaveWindow
-from modules.utils import XCORR_vshot, plot_xcorr, Dispersion, XCORR_two_traces, extrap1d
+from modules.utils import XCORR_vshot, plot_xcorr, Dispersion, XCORR_two_traces, extrap1d, plot_fv_map
 
 def xcorr_two_traces_based_on_traj(data, t_axis, pivot_idx, f, end_idx, wlen, dt, nsamp, x_axis, delta_t=1, reverse=False):
     nch = abs(end_idx - pivot_idx) - 1
