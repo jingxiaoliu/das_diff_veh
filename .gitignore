@@ -160,3 +160,20 @@ cython_debug/
 #.idea/
 
 *.pkl
+
+
+# macOS.gitignore
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# VisualStudioCode.gitignore
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# ignore jupyter notebook checkpoints
+.ipynb_checkpoints/
