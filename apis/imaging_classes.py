@@ -3,7 +3,46 @@ import copy
 import random
 from apis.dispersion_classes import SurfaceWaveDispersion
 from apis.virtual_shot_gather import VirtualShotGather
-from modules.utils import fv_map_enhance,plot_fv_map
+from modules.utils import fv_map_enhance,plot_fv_map,extract_ridge_ref_idx
+
+def bootstrap_disp(surf_wins, bt_size, bt_times, sigma, pivot, start_x, end_x, ref_freq_idx, freq_lb, freq_up):
+    """
+    Perform bootstrap resampling for dispersion curve extraction.
+
+    Args:
+        surf_wins (list): List of surface wave windows.
+        bt_size (int): Size of each bootstrap sample.
+        bt_times (int): Number of bootstrap iterations.
+        sigma (float): Sigma value for ridge extraction.
+        pivot (float): Pivot point for image generation.
+        start_x (float): Start x-coordinate for image generation.
+        end_x (float): End x-coordinate for image generation.
+        ref_freq_idx (int): Index of the reference frequency.
+        freq_lb (float): Lower frequency bound for dispersion curve extraction.
+        freq_up (float): Upper frequency bound for dispersion curve extraction.
+
+    Returns:
+        list: List of extracted ridge velocities for each bootstrap iteration.
+    """
+    ridge_vel = []
+
+    for _ in range(bt_times):
+        sel_idx = random.sample(range(1, len(surf_wins)), bt_size)
+        selected_windows = [surf_wins[i] for i in sel_idx]
+        image_from_window_cls = VirtualShotGathersFromWindows
+        images = image_from_window_cls(selected_windows)
+        images.get_images(pivot=pivot, start_x=start_x, end_x=end_x, wlen=2, include_other_side=True)
+        images.avg_image.compute_disp_image(end_x=0, start_x=-150)
+        freqs_tmp = images.avg_image.disp.freqs
+
+        # Extract ridge velocity for the selected frequency range
+        ridge_vel.append(extract_ridge_ref_idx(freqs_tmp[(freqs_tmp >= freq_lb) & (freqs_tmp < freq_up)],
+                                              images.avg_image.disp.vels,
+                                              images.avg_image.disp.fv_map[:, (freqs_tmp >= freq_lb) & (freqs_tmp < freq_up)],
+                                              ref_freq_idx=ref_freq_idx,
+                                              sigma=sigma, vel_max=800))
+
+    return ridge_vel,freqs_tmp
 
 def save_disp_imgs(windows, weight, min_win, x, start_x, end_x, offset, fig_dir):
     # Create an instance of VirtualShotGathersFromWindows class

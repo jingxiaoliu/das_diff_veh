@@ -611,3 +611,71 @@ def fv_map_enhance(fv_map):
     fv_map_enhanced = clahe.apply(fv_map)
     fv_map_enhanced = cv.blur(fv_map_enhanced,(10,10))
     return fv_map_enhanced
+
+def extract_ridge_ref_idx(freq, vel, fv_map, ref_freq_idx=None, sigma=25, vel_max=400):
+    """
+    Extracts the ridgeline from the frequency-velocity map.
+
+    Args:
+        freq (numpy.ndarray): Array of frequencies.
+        vel (numpy.ndarray): Array of velocities (in m/s).
+        fv_map (numpy.ndarray): Frequency-velocity map with shape (Nvel, Nfreq).
+        ref_freq_idx (int, optional): Index of the reference frequency. If not provided, no reference curve is used.
+        sigma (int, optional): Sigma value for ridgeline extraction.
+        vel_max (int, optional): Maximum velocity.
+
+    Returns:
+        numpy.ndarray: Extracted ridgeline velocities.
+
+    Note: Velocity unit is m/s for vel, sigma, and vel_max.
+    """
+    # Reverse the velocity array
+    vel = vel[::-1]
+
+    if ref_freq_idx is None:
+        # No reference curve provided, find the maximum peak in the entire fv_map
+        max_idx = np.abs(vel_max - vel).argmin()
+        vel = vel[max_idx:]
+        fv_map = fv_map[max_idx:]
+        return vel[np.argmax(fv_map, axis=0)]
+                   
+    else:
+        vel_output = np.zeros((len(freq),))
+        ref_freq = freq[ref_freq_idx]
+        vel_output[ref_freq_idx] = vel[np.argmax(fv_map[:, ref_freq_idx])]
+
+        # Backward ridgeline extraction
+        for i in range(ref_freq_idx - 1, -1, -1):
+            mask = (vel > (vel_output[i + 1] - sigma)) & (vel < (vel_output[i + 1] + sigma))
+            fv_map_tmp = fv_map[mask, i]
+            vel_tmp = vel[mask]
+            vel_output[i] = vel_tmp[np.argmax(fv_map_tmp)]
+
+        # Forward ridgeline extraction
+        for i in range(ref_freq_idx + 1, len(freq)):
+            mask = (vel > (vel_output[i - 1] - sigma)) & (vel < (vel_output[i - 1] + sigma))
+            fv_map_tmp = fv_map[mask, i]
+            vel_tmp = vel[mask]
+            vel_output[i] = vel_tmp[np.argmax(fv_map_tmp)]
+
+        return vel_output
+    
+def plot_disp_curves(freqs, ridge_vel):
+    """
+    Plot dispersion curve with error bars.
+    """
+    fig = plt.figure(figsize=(8, 4))
+    ridge_vel_mean = np.mean(ridge_vel,0)
+    ridge_std = np.asarray([np.std(ridge_vel,0), np.std(ridge_vel,0)])
+    plt.errorbar(freqs, ridge_vel_mean, yerr=ridge_std, fmt='-k', 
+                 alpha=0.5, linewidth=2, markersize=5)
+    for i in range(len(ridge_vel)):
+        plt.plot(freqs, ridge_vel[i], '-k', alpha=0.1)
+    plt.grid()
+    plt.xlabel("Frequency [Hz]", fontsize=24)
+    plt.ylabel("Phase velocity [m/s]", fontsize=24)
+    plt.tick_params(axis='both', which='major', labelsize=20)
+    plt.tight_layout()
+    plt.xlim([2, 15])
+    plt.ylim([250, 700])
+    plt.show()
