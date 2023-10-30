@@ -679,3 +679,4 @@ def plot_disp_curves(freqs, ridge_vel):
     plt.xlim([2, 15])
     plt.ylim([250, 700])
     plt.show()
+    return ridge_vel_mean,np.max(ridge_vel,axis=0)-np.min(ridge_vel,axis=0)
