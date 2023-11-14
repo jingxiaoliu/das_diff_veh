@@ -5,7 +5,7 @@ from apis.dispersion_classes import SurfaceWaveDispersion
 from apis.virtual_shot_gather import VirtualShotGather
 from modules.utils import fv_map_enhance,plot_fv_map,extract_ridge_ref_idx
 
-def bootstrap_disp(surf_wins, bt_size, bt_times, sigma, pivot, start_x, end_x, ref_freq_idx, freq_lb, freq_up):
+def bootstrap_disp(surf_wins, bt_size, bt_times, sigma, pivot, start_x, end_x, ref_freq_idx, freq_lb, freq_up, ref_vel):
     """
     Perform bootstrap resampling for dispersion curve extraction.
 
@@ -25,6 +25,8 @@ def bootstrap_disp(surf_wins, bt_size, bt_times, sigma, pivot, start_x, end_x, r
         list: List of extracted ridge velocities for each bootstrap iteration.
     """
     ridge_vel = []
+    for i in range(len(freq_lb)):
+        ridge_vel.append([])
 
     for _ in range(bt_times):
         sel_idx = random.sample(range(1, len(surf_wins)), bt_size)
@@ -36,11 +38,12 @@ def bootstrap_disp(surf_wins, bt_size, bt_times, sigma, pivot, start_x, end_x, r
         freqs_tmp = images.avg_image.disp.freqs
 
         # Extract ridge velocity for the selected frequency range
-        ridge_vel.append(extract_ridge_ref_idx(freqs_tmp[(freqs_tmp >= freq_lb) & (freqs_tmp < freq_up)],
-                                              images.avg_image.disp.vels,
-                                              images.avg_image.disp.fv_map[:, (freqs_tmp >= freq_lb) & (freqs_tmp < freq_up)],
-                                              ref_freq_idx=ref_freq_idx,
-                                              sigma=sigma, vel_max=800))
+        for i in range(len(freq_lb)):
+            ridge_vel[i].append(extract_ridge_ref_idx(freqs_tmp[(freqs_tmp >= freq_lb[i]) & (freqs_tmp < freq_up[i])],
+                                                  images.avg_image.disp.vels,
+                                                  images.avg_image.disp.fv_map[:, (freqs_tmp >= freq_lb[i]) & (freqs_tmp < freq_up[i])],
+                                                  ref_freq_idx=ref_freq_idx[i]-len(freqs_tmp[(freqs_tmp < freq_lb[i])]),
+                                                  sigma=sigma[i], vel_max=800,ref_vel=ref_vel[i]))
 
     return ridge_vel,freqs_tmp
 

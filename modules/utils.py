@@ -612,7 +612,7 @@ def fv_map_enhance(fv_map):
     fv_map_enhanced = cv.blur(fv_map_enhanced,(10,10))
     return fv_map_enhanced
 
-def extract_ridge_ref_idx(freq, vel, fv_map, ref_freq_idx=None, sigma=25, vel_max=400):
+def extract_ridge_ref_idx(freq, vel, fv_map, ref_freq_idx=None, sigma=25, vel_max=400, ref_vel=None):
     """
     Extracts the ridgeline from the frequency-velocity map.
 
@@ -642,41 +642,61 @@ def extract_ridge_ref_idx(freq, vel, fv_map, ref_freq_idx=None, sigma=25, vel_ma
     else:
         vel_output = np.zeros((len(freq),))
         ref_freq = freq[ref_freq_idx]
-        vel_output[ref_freq_idx] = vel[np.argmax(fv_map[:, ref_freq_idx])]
+        if ref_vel is None:
+            vel_output[ref_freq_idx] = vel[np.argmax(fv_map[:, ref_freq_idx])]
+            # Backward ridgeline extraction
+            for i in range(ref_freq_idx - 1, -1, -1):
+                mask = (vel > (vel_output[i + 1] - sigma)) & (vel < (vel_output[i + 1] + sigma))
+                fv_map_tmp = fv_map[mask, i]
+                vel_tmp = vel[mask]
+                vel_output[i] = vel_tmp[np.argmax(fv_map_tmp)]
 
-        # Backward ridgeline extraction
-        for i in range(ref_freq_idx - 1, -1, -1):
-            mask = (vel > (vel_output[i + 1] - sigma)) & (vel < (vel_output[i + 1] + sigma))
-            fv_map_tmp = fv_map[mask, i]
-            vel_tmp = vel[mask]
-            vel_output[i] = vel_tmp[np.argmax(fv_map_tmp)]
+            # Forward ridgeline extraction
+            for i in range(ref_freq_idx + 1, len(freq)):
+                mask = (vel > (vel_output[i - 1] - sigma)) & (vel < (vel_output[i - 1] + sigma))
+                fv_map_tmp = fv_map[mask, i]
+                vel_tmp = vel[mask]
+                vel_output[i] = vel_tmp[np.argmax(fv_map_tmp)]
+        else:
+            # Reference velocity
+            vel_ref = ref_vel(freq)
+            # Mask dispersion map
+            for i in range(len(freq)):
+                mask = (vel > (vel_ref[i] - sigma)) & (vel < (vel_ref[i] + sigma))
+                fv_map_tmp = fv_map[mask, i]
+                vel_tmp = vel[mask]
+                vel_output[i] = vel_tmp[np.argmax(fv_map_tmp)]
+        
+        vel_output = signal.savgol_filter(vel_output, 25, 2)
 
-        # Forward ridgeline extraction
-        for i in range(ref_freq_idx + 1, len(freq)):
-            mask = (vel > (vel_output[i - 1] - sigma)) & (vel < (vel_output[i - 1] + sigma))
-            fv_map_tmp = fv_map[mask, i]
-            vel_tmp = vel[mask]
-            vel_output[i] = vel_tmp[np.argmax(fv_map_tmp)]
+        return vel_output   
 
-        return vel_output
-    
-def plot_disp_curves(freqs, ridge_vel):
+def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels):
     """
     Plot dispersion curve with error bars.
     """
     fig = plt.figure(figsize=(8, 4))
-    ridge_vel_mean = np.mean(ridge_vel,0)
-    ridge_std = np.asarray([np.std(ridge_vel,0), np.std(ridge_vel,0)])
-    plt.errorbar(freqs, ridge_vel_mean, yerr=ridge_std, fmt='-k', 
-                 alpha=0.5, linewidth=2, markersize=5)
-    for i in range(len(ridge_vel)):
-        plt.plot(freqs, ridge_vel[i], '-k', alpha=0.1)
+    ridge_vel_means = []
+    ridge_vel_ranges = []
+    ridge_vel_stds = []
+    for i in range(len(ridge_vels)):
+        freq = freqs[(freqs >= freq_lb[i]) & (freqs < freq_up[i])]
+        ridge_vel = np.array([d for d in ridge_vels[i]],dtype=np.float64)
+        ridge_vel_mean = np.mean(ridge_vel,axis=0)
+        ridge_vel_means.append(ridge_vel_mean)
+        ridge_std = np.asarray([np.std(ridge_vel,axis=0), np.std(ridge_vel,axis=0)])
+        ridge_vel_stds.append(np.std(ridge_vel,axis=0))
+        ridge_vel_ranges.append(np.max(ridge_vel,axis=0)-np.min(ridge_vel,axis=0))
+        plt.errorbar(freq, ridge_vel_mean, yerr=ridge_std, fmt='-k', 
+                     alpha=0.5, linewidth=2, markersize=5)
+        for i in range(len(ridge_vel)):
+            plt.plot(freq, ridge_vel[i], '-k', alpha=0.1)
     plt.grid()
     plt.xlabel("Frequency [Hz]", fontsize=24)
     plt.ylabel("Phase velocity [m/s]", fontsize=24)
     plt.tick_params(axis='both', which='major', labelsize=20)
     plt.tight_layout()
-    plt.xlim([2, 15])
-    plt.ylim([250, 700])
+    plt.xlim([2, 25])
+    plt.ylim([250, 800])
     plt.show()
-    return ridge_vel_mean,np.max(ridge_vel,axis=0)-np.min(ridge_vel,axis=0)
+    return ridge_vel_means,ridge_vel_ranges,ridge_vel_stds
