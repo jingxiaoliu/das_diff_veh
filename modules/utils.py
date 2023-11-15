@@ -570,7 +570,7 @@ def plot_fv_map(fv_map, freqs, vels, norm=True, fig_dir="Fig/", fig_name=None, a
            os.makedirs(fig_dir)
         print(f'saving {fig_path}...')
         plt.savefig(f"{fig_path}")
-        plt.close()
+#         plt.close()
     else:
         plt.show()
 
@@ -671,7 +671,7 @@ def extract_ridge_ref_idx(freq, vel, fv_map, ref_freq_idx=None, sigma=25, vel_ma
 
         return vel_output   
 
-def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels):
+def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels, fig_save=False):
     """
     Plot dispersion curve with error bars.
     """
@@ -698,5 +698,10 @@ def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels):
     plt.tight_layout()
     plt.xlim([2, 25])
     plt.ylim([250, 800])
-    plt.show()
+    if fig_save:
+        plt.savefig(fig_save)
+        plt.close()
+    else:
+        plt.show()        
+
     return ridge_vel_means,ridge_vel_ranges,ridge_vel_stds
