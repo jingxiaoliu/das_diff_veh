@@ -705,3 +705,16 @@ def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels, fig_save=False):
         plt.show()        
 
     return ridge_vel_means,ridge_vel_ranges,ridge_vel_stds
+
+def win_avg_psd(win_spectrum,fs,nperseg=2048):
+    n = 0
+    f, Pxx = signal.welch(win_spectrum[0].data[0,:], fs, nperseg=nperseg)
+    Pxxs = np.zeros(Pxx.shape)
+    for i in range(len(win_spectrum)):
+        sw_data = win_spectrum[i].data
+        for j in range(sw_data.shape[0]):
+            n+=1
+            f, Pxx = signal.welch(sw_data[j,:], fs, nperseg=nperseg)
+            Pxxs+=Pxx
+    Pxx_avg = Pxxs/n
+    return f,Pxx_avg
