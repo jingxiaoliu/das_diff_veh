@@ -330,7 +330,7 @@ def plot_xcorr(xcorr, t_axis, x_axis=None, ax=None, figsize=(8, 10),
                cmap='seismic', vmax_use_max=False,
                fig_dir=None,
                fig_name=None,
-               fontsize=24, tickfont=20,
+               fontsize=12, tickfont=12,
                x_lim=None,
                **plot_kwargs):
     if x_lim is None:
@@ -341,7 +341,7 @@ def plot_xcorr(xcorr, t_axis, x_axis=None, ax=None, figsize=(8, 10),
     nt = t_axis.size
     x_origin_index = np.abs(x_axis).argmin()
     xcorr /= np.amax(xcorr[x_origin_index])
-    vmax = plot_kwargs.get("vmax", np.percentile(np.absolute(xcorr), 100)) if vmax_use_max else 1
+    vmax = plot_kwargs.get("vmax", np.percentile(np.absolute(xcorr), 99)) if vmax_use_max else 1
 
     start_x = 0
     end_x = xcorr.shape[0]
@@ -359,8 +359,8 @@ def plot_xcorr(xcorr, t_axis, x_axis=None, ax=None, figsize=(8, 10),
     plt.imshow(xcorr_to_plot.T, aspect="auto", vmax=vmax, vmin=-vmax, cmap=cmap,
                extent=[start_x, end_x, t_axis[-1], t_axis[0]], interpolation='bicubic')
     # plt.ylim([t_lim, -t_lim])
-    plt.xlabel("Distance along the fiber [m]", fontsize=fontsize)
-    plt.ylabel("Time lag [s]", fontsize=fontsize)
+    plt.xlabel("Distance along the fiber (m)", fontsize=fontsize)
+    plt.ylabel("Time lag (s)", fontsize=fontsize)
 
     ax.tick_params(axis='both', which='major', labelsize=tickfont)
 
@@ -368,7 +368,7 @@ def plot_xcorr(xcorr, t_axis, x_axis=None, ax=None, figsize=(8, 10),
     if fig_name and fig_dir:
         plt.tight_layout()
         fig_path = os.path.join(fig_dir, fig_name)
-        plt.savefig(fig_path)
+        plt.savefig(fig_path, format='pdf')
         print(f'{fig_path} has saved...')
     else:
         plt.show()
@@ -516,7 +516,7 @@ def map_fv_smooth(data, dx, dt, freqs, vels, norm=False):
 
     return fv_map.T
 
-def plot_fv_map(fv_map, freqs, vels, norm=True, fig_dir="Fig/", fig_name=None, ax=None, pclip=100, fontsize=24, tickfont=20, ridge_data=None, norm_part = None, **kwargs):
+def plot_fv_map(fv_map, freqs, vels, norm=True, fig_dir="Fig/", fig_name=None, ax=None, pclip=100, fontsize=12, tickfont=12, ridge_data=None, norm_part = None, **kwargs):
 
 #     norm = True
     if norm:         
@@ -539,7 +539,7 @@ def plot_fv_map(fv_map, freqs, vels, norm=True, fig_dir="Fig/", fig_name=None, a
                 fv_map[idxi,idxj] = fv_map_win[i,j]
         fv_map = np.flip(fv_map,0)
     if not ax:
-        fig, ax = plt.subplots(figsize=kwargs.get('figsize', (15,8)))
+        fig, ax = plt.subplots(figsize=kwargs.get('figsize', (4,3)))
 
     pclip = 98
     vmax = np.percentile(np.abs(fv_map), pclip)
@@ -559,17 +559,19 @@ def plot_fv_map(fv_map, freqs, vels, norm=True, fig_dir="Fig/", fig_name=None, a
         
     ax.grid()
 
-    ax.set_xlabel("Frequency [Hz]", fontsize=fontsize)
-    ax.set_ylabel("Phase velocity [m/s]", fontsize=fontsize)
+    ax.set_xlabel("Frequency (Hz)", fontsize=fontsize)
+    ax.set_ylabel("Phase velocity (m/s)", fontsize=fontsize)
     ax.tick_params(axis='both', which='major', labelsize=tickfont)
     plt.tight_layout()
+    plt.xlim([2, 25])
+    plt.ylim([250, 800])
     if fig_name:
         fig_path = os.path.join(fig_dir, fig_name)
         isExist = os.path.exists(fig_dir)
         if not isExist:
            os.makedirs(fig_dir)
         print(f'saving {fig_path}...')
-        plt.savefig(f"{fig_path}")
+        plt.savefig(f"{fig_path}", format='pdf')
 #         plt.close()
     else:
         plt.show()
@@ -675,7 +677,7 @@ def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels, fig_save=False):
     """
     Plot dispersion curve with error bars.
     """
-    fig = plt.figure(figsize=(8, 4))
+    fig = plt.figure(figsize=(4, 3))
     ridge_vel_means = []
     ridge_vel_ranges = []
     ridge_vel_stds = []
@@ -687,19 +689,19 @@ def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels, fig_save=False):
         ridge_std = np.asarray([np.std(ridge_vel,axis=0), np.std(ridge_vel,axis=0)])
         ridge_vel_stds.append(np.std(ridge_vel,axis=0))
         ridge_vel_ranges.append(np.max(ridge_vel,axis=0)-np.min(ridge_vel,axis=0))
-        plt.errorbar(freq, ridge_vel_mean, yerr=ridge_std, fmt='-k', 
-                     alpha=0.5, linewidth=2, markersize=5)
+        plt.errorbar(freq, ridge_vel_mean, yerr=ridge_std, fmt='-k', capsize=0.5,
+                     elinewidth=0.5, alpha=0.4, linewidth=2, markersize=5)
         for i in range(len(ridge_vel)):
-            plt.plot(freq, ridge_vel[i], '-k', alpha=0.1)
+            plt.plot(freq, ridge_vel[i], '-k', alpha=0.2, linewidth=1)
     plt.grid()
-    plt.xlabel("Frequency [Hz]", fontsize=24)
-    plt.ylabel("Phase velocity [m/s]", fontsize=24)
-    plt.tick_params(axis='both', which='major', labelsize=20)
+    plt.xlabel("Frequency (Hz)", fontsize=12)
+    plt.ylabel("Phase velocity (m/s)", fontsize=12)
+    plt.tick_params(axis='both', which='major', labelsize=12)
     plt.tight_layout()
     plt.xlim([2, 25])
     plt.ylim([250, 800])
     if fig_save:
-        plt.savefig(fig_save)
+        plt.savefig(fig_save, format='pdf')
         plt.close()
     else:
         plt.show()        
@@ -707,14 +709,16 @@ def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels, fig_save=False):
     return ridge_vel_means,ridge_vel_ranges,ridge_vel_stds
 
 def win_avg_psd(win_spectrum,fs,nperseg=2048):
-    n = 0
     f, Pxx = signal.welch(win_spectrum[0].data[0,:], fs, nperseg=nperseg)
-    Pxxs = np.zeros(Pxx.shape)
+    Pxxs = np.zeros((len(win_spectrum),Pxx.shape[0]))
     for i in range(len(win_spectrum)):
+        n = 0
         sw_data = win_spectrum[i].data
+        Pxxs_ = np.zeros(Pxx.shape)
         for j in range(sw_data.shape[0]):
             n+=1
             f, Pxx = signal.welch(sw_data[j,:], fs, nperseg=nperseg)
-            Pxxs+=Pxx
-    Pxx_avg = Pxxs/n
-    return f,Pxx_avg
+            Pxxs_+=Pxx
+        Pxxs[i,:] = Pxxs_/n    
+    Pxx_avg = np.mean(Pxxs,axis=0)
+    return f,Pxx_avg,Pxxs,

@@ -60,7 +60,7 @@ def save_disp_imgs(windows, weight, min_win, x, start_x, end_x, offset, fig_dir)
     _images.get_images(pivot=x, start_x=start_x, end_x=end_x, wlen=2, include_other_side=True)    
     # Plot average image
     _images.avg_image.plot_image(norm=True, x_lim=[-offset, offset], 
-                                 fig_dir=f"{fig_dir}/{x}/", fig_name=f"sg_{weight}_cars.png")    
+                                 fig_dir=f"{fig_dir}/{x}/", fig_name=f"sg_{weight}_cars.pdf")    
     # Compute dispersion image
     _images.avg_image.compute_disp_image(end_x=0, start_x=-offset)    
     # Enhance the fv_map of dispersion
@@ -69,18 +69,18 @@ def save_disp_imgs(windows, weight, min_win, x, start_x, end_x, offset, fig_dir)
     # Plot fv_map without normalization
     plot_fv_map(_images.avg_image.disp.fv_map, _images.avg_image.disp.freqs, 
                 _images.avg_image.disp.vels, norm=False,
-                fig_dir=f"{fig_dir}/{x}/", fig_name=f"disp_{weight}_cars_no_norm.png",
+                fig_dir=f"{fig_dir}/{x}/", fig_name=f"disp_{weight}_cars_no_norm.pdf",
                 ridge_data=None, norm_part=False)    
     # Plot fv_map with normalization
     plot_fv_map(_images.avg_image.disp.fv_map, _images.avg_image.disp.freqs, 
                 _images.avg_image.disp.vels, norm=True,
-                fig_dir=f"{fig_dir}/{x}/", fig_name=f"disp_{weight}_cars_no_enhance.png",
+                fig_dir=f"{fig_dir}/{x}/", fig_name=f"disp_{weight}_cars_no_enhance.pdf",
                 ridge_data=None, norm_part=False)    
     # Plot enhanced fv_map
-    plot_fv_map(fv_map_enhanced, _images.avg_image.disp.freqs, 
-                _images.avg_image.disp.vels, norm=True,
-                fig_dir=f"{fig_dir}/{x}/", fig_name=f"disp_{weight}_cars.png",
-                ridge_data=None, norm_part=False)
+#     plot_fv_map(fv_map_enhanced, _images.avg_image.disp.freqs, 
+#                 _images.avg_image.disp.vels, norm=True,
+#                 fig_dir=f"{fig_dir}/{x}/", fig_name=f"disp_{weight}_cars.png",
+#                 ridge_data=None, norm_part=False)
     
     return images_all
 

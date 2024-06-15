@@ -237,7 +237,7 @@ class VirtualShotGather:
         if not plot_disp:
             ax = kwargs.get('ax')
             if not ax:
-                fig, ax = plt.subplots(figsize=kwargs.get('figsize', (8,10)))
+                fig, ax = plt.subplots(figsize=kwargs.get('figsize', (4,4.5)))
             plot_xcorr(self.XCF_out, self.t_axis, self.x_axis, ax=ax, fig_dir=fig_dir, fig_name=fig_name, x_lim=x_lim, **plot_kwargs)
         else:
             assert self.disp, "please run obj.compute_disp_image() first"

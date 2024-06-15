@@ -65,19 +65,33 @@ def remove_unrealistic_tracking(veh_base, veh_states, adjacency_nan_count_lim=20
     tracked_v = veh_states[valid_num_tmp, :]
     return tracked_v
 
-def plot_data(data, x_axis, t_axis, pclip=98, ax=None, figsize=(10, 10), y_lim=None, x_lim=None):
-    vmax = np.percentile(np.abs(data), pclip)
+def plot_data(data, x_axis, t_axis, pclip=98, ax=None, figsize=(10, 10), y_lim=None, x_lim=None, vmax=None, save_path=None, state=None):
+    if not vmax:
+        vmax = np.percentile(np.abs(data), pclip)
     if not ax:
-        fig, ax = plt.subplots(figsize=figsize)
-    ax.imshow(data.T,
-              aspect="auto",
-              extent=[x_axis[0], x_axis[-1], t_axis[-1], t_axis[0]],
-              cmap="gray",
-              vmax=vmax,
-              vmin=-vmax)
-    # ax.set_xlim([0, 800])
-    ax.set_ylim(y_lim)
-    ax.set_xlim(x_lim)
+        fig, ax = plt.subplots(figsize=figsize)    
+    cax = ax.imshow(data.T,
+                    aspect="auto",
+                    extent=[x_axis[0], x_axis[-1], t_axis[-1], t_axis[0]],
+                    cmap="seismic",
+                    vmax=vmax,
+                    vmin=-vmax)    
+    cbar = fig.colorbar(cax, ax=ax)
+    cbar.set_label('DAS', fontsize=12)
+    ax.set_xlabel('Distance (m)', fontsize=12)
+    ax.set_ylabel('Time (s)', fontsize=12)
+    if y_lim:
+        ax.set_ylim(y_lim)
+    if x_lim:
+        ax.set_xlim(x_lim)
+    
+    ax.tick_params(axis='both', which='major', labelsize=12)
+    cbar.ax.tick_params(labelsize=12)
+    plt.tight_layout()
+    if save_path:
+        plt.savefig(save_path, format='pdf')
+    
+    plt.show()
 
 # def bandpass_data(data, t_axis, flo, fhi):
 #     dt = t_axis[1] - t_axis[0]
