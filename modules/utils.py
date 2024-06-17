@@ -672,7 +672,7 @@ def extract_ridge_ref_idx(freq, vel, fv_map, ref_freq_idx=None, sigma=25, vel_ma
         vel_output = signal.savgol_filter(vel_output, 25, 2)
 
         return vel_output   
-
+    
 def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels, fig_save=False):
     """
     Plot dispersion curve with error bars.
@@ -688,11 +688,11 @@ def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels, fig_save=False):
         ridge_vel_means.append(ridge_vel_mean)
         ridge_std = np.asarray([np.std(ridge_vel,axis=0), np.std(ridge_vel,axis=0)])
         ridge_vel_stds.append(np.std(ridge_vel,axis=0))
+        ridge_std_plot = np.asarray([np.std(ridge_vel,axis=0)[::5], np.std(ridge_vel,axis=0)[::5]])
         ridge_vel_ranges.append(np.max(ridge_vel,axis=0)-np.min(ridge_vel,axis=0))
-        plt.errorbar(freq, ridge_vel_mean, yerr=ridge_std, fmt='-k', capsize=0.5,
-                     elinewidth=0.5, alpha=0.4, linewidth=2, markersize=5)
+        plt.errorbar(freq[::5], ridge_vel_mean[::5], yerr=ridge_std_plot, fmt='ro', capsize=0.5, markersize=3)
         for i in range(len(ridge_vel)):
-            plt.plot(freq, ridge_vel[i], '-k', alpha=0.2, linewidth=1)
+            plt.plot(freq, ridge_vel[i], '-b', alpha=0.2, linewidth=1)
     plt.grid()
     plt.xlabel("Frequency (Hz)", fontsize=12)
     plt.ylabel("Phase velocity (m/s)", fontsize=12)
