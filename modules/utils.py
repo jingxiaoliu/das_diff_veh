@@ -671,7 +671,7 @@ def extract_ridge_ref_idx(freq, vel, fv_map, ref_freq_idx=None, sigma=25, vel_ma
         
         vel_output = signal.savgol_filter(vel_output, 25, 2)
 
-        return vel_output   
+        return vel_output  
     
 def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels, fig_save=False):
     """
@@ -683,16 +683,17 @@ def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels, fig_save=False):
     ridge_vel_stds = []
     for i in range(len(ridge_vels)):
         freq = freqs[(freqs >= freq_lb[i]) & (freqs < freq_up[i])]
-        ridge_vel = np.array([d for d in ridge_vels[i]],dtype=np.float64)
+        ridge_vel = np.array([d for d in ridge_vels[i]],dtype=np.float64)        
+        for i in range(len(ridge_vel)):
+            plt.plot(freq, ridge_vel[i], '-b', alpha=0.2, linewidth=1)
         ridge_vel_mean = np.mean(ridge_vel,axis=0)
         ridge_vel_means.append(ridge_vel_mean)
         ridge_std = np.asarray([np.std(ridge_vel,axis=0), np.std(ridge_vel,axis=0)])
         ridge_vel_stds.append(np.std(ridge_vel,axis=0))
         ridge_std_plot = np.asarray([np.std(ridge_vel,axis=0)[::5], np.std(ridge_vel,axis=0)[::5]])
         ridge_vel_ranges.append(np.max(ridge_vel,axis=0)-np.min(ridge_vel,axis=0))
-        plt.errorbar(freq[::5], ridge_vel_mean[::5], yerr=ridge_std_plot, fmt='ro', capsize=0.5, markersize=3)
-        for i in range(len(ridge_vel)):
-            plt.plot(freq, ridge_vel[i], '-b', alpha=0.2, linewidth=1)
+        plt.errorbar(freq[::5], ridge_vel_mean[::5], yerr=ridge_std_plot, fmt='ro', 
+                     zorder=3, markersize=3, linewidth=2)
     plt.grid()
     plt.xlabel("Frequency (Hz)", fontsize=12)
     plt.ylabel("Phase velocity (m/s)", fontsize=12)
@@ -705,7 +706,6 @@ def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels, fig_save=False):
         plt.close()
     else:
         plt.show()        
-
     return ridge_vel_means,ridge_vel_ranges,ridge_vel_stds
 
 def win_avg_psd(win_spectrum,fs,nperseg=2048):
