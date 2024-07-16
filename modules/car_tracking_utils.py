@@ -71,13 +71,13 @@ def plot_data(data, x_axis, t_axis, pclip=98, ax=None, figsize=(10, 10), y_lim=N
     if not ax:
         fig, ax = plt.subplots(figsize=figsize)    
     cax = ax.imshow(data.T,
-                    aspect="auto",
+                    aspect="auto",interpolation='bilinear',
                     extent=[x_axis[0], x_axis[-1], t_axis[-1], t_axis[0]],
                     cmap="seismic",
                     vmax=vmax,
                     vmin=-vmax)    
     cbar = fig.colorbar(cax, ax=ax)
-    cbar.set_label('DAS', fontsize=12)
+    cbar.set_label('DAS response', fontsize=12)
     ax.set_xlabel('Distance (m)', fontsize=12)
     ax.set_ylabel('Time (s)', fontsize=12)
     if y_lim:

@@ -202,13 +202,15 @@ def plot_data(data, x_axis, t_axis, pclip=98, ax=None, figsize=(10, 10), y_lim=N
     ax.imshow(data.T,
               aspect="auto",
               extent=[x_axis[0], x_axis[-1], t_axis[-1], t_axis[0]],
-              cmap="gray",
+              cmap="seismic",
               vmax=vmax,
               vmin=-vmax)
     ax.set_ylim(y_lim)
     ax.set_xlim(x_lim)
-    plt.xlabel("Distance along the fiber [m]", fontsize=fontsize)
-    ax.set_ylabel("Time [s]", fontsize=fontsize)
+    cbar = fig.colorbar(cax, ax=ax)
+    cbar.set_label('DAS response', fontsize=12)
+    ax.set_xlabel('Distance (m)', fontsize=12)
+    ax.set_ylabel('Time (s)', fontsize=12)
     ax.tick_params(axis='both', which='major', labelsize=tickfont)
     if fig_name:
         fig_path = os.path.join(fig_dir, fig_name)
@@ -359,9 +361,10 @@ def plot_xcorr(xcorr, t_axis, x_axis=None, ax=None, figsize=(8, 10),
     plt.imshow(xcorr_to_plot.T, aspect="auto", vmax=vmax, vmin=-vmax, cmap=cmap,
                extent=[start_x, end_x, t_axis[-1], t_axis[0]], interpolation='bicubic')
     # plt.ylim([t_lim, -t_lim])
-    plt.xlabel("Distance along the fiber (m)", fontsize=fontsize)
+    plt.xlabel("Offset (m)", fontsize=fontsize)
     plt.ylabel("Time lag (s)", fontsize=fontsize)
-
+    plt.grid(True)
+    
     ax.tick_params(axis='both', which='major', labelsize=tickfont)
 
     plt.xlim(x_lim)
@@ -564,7 +567,7 @@ def plot_fv_map(fv_map, freqs, vels, norm=True, fig_dir="Fig/", fig_name=None, a
     ax.tick_params(axis='both', which='major', labelsize=tickfont)
     plt.tight_layout()
     plt.xlim([2, 25])
-    plt.ylim([250, 800])
+    plt.ylim([250, 900])
     if fig_name:
         fig_path = os.path.join(fig_dir, fig_name)
         isExist = os.path.exists(fig_dir)
@@ -700,7 +703,7 @@ def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels, fig_save=False):
     plt.tick_params(axis='both', which='major', labelsize=12)
     plt.tight_layout()
     plt.xlim([2, 25])
-    plt.ylim([250, 800])
+    plt.ylim([250, 900])
     if fig_save:
         plt.savefig(fig_save, format='pdf')
         plt.close()
