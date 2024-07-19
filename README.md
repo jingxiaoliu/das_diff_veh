@@ -4,7 +4,7 @@ This is the repository for the following paper. If you use this implementation, 
 >* TODO
 [[paper]](TODO)
 
-### Scripts
+## Scripts
 Jupyter notebooks and Python scripts for project setup and execution.
 - `imaging_diff_speed.ipynb`: Script for DAS data characterization and dispersion analysis for different traveling speeds at the pivot location of 700 meters.
 - `imaging_diff_speed_600.ipynb`: Script for DAS data characterization and dispersion analysis for different traveling speeds at the pivot location of 600 meters.
