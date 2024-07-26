@@ -568,6 +568,7 @@ def plot_fv_map(fv_map, freqs, vels, norm=True, fig_dir="Fig/", fig_name=None, a
     plt.tight_layout()
     plt.xlim([2, 25])
     plt.ylim([250, 900])
+    plt.xticks([2,5,10,15,20,25])
     if fig_name:
         fig_path = os.path.join(fig_dir, fig_name)
         isExist = os.path.exists(fig_dir)
