@@ -706,7 +706,7 @@ def plot_disp_curves(freqs, freq_lb, freq_up, ridge_vels, fig_save=False):
     plt.xlim([2, 25])
     plt.ylim([250, 900])
     if fig_save:
-        plt.savefig(fig_save, format='pdf')
+        plt.savefig(fig_save, format='svg')
         plt.close()
     else:
         plt.show()        
