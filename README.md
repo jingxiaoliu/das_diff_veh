@@ -2,7 +2,6 @@
 
 This is the repository for the following paper. If you use this implementation, please cite our paper:
 >* Liu, J., Li, H., Yuan, S., Noh, H.Y., & Biondi, B. (2024). Characterizing Vehicle-Induced Distributed Acoustic Sensing Signals for Accurate Urban Near-Surface Imaging. https://arxiv.org/abs/2408.14320
-[[paper]](https://arxiv.org/abs/2408.14320)
 
 ## Scripts
 Jupyter notebooks and Python scripts for project setup and execution.
