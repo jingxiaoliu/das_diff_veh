@@ -1,8 +1,8 @@
 # Near-surface characterization using classified vehicle-induced surface waves from distributed acoustic sensing![image](https://github.com/user-attachments/assets/61f2a90e-6ff6-45e5-a503-36b5974dbe95)
 
 This is the repository for the following paper. If you use this implementation, please cite our paper:
->* TODO
-[[paper]](TODO)
+>* Liu, J., Li, H., Yuan, S., Noh, H.Y., & Biondi, B. (2024). Characterizing Vehicle-Induced Distributed Acoustic Sensing Signals for Accurate Urban Near-Surface Imaging. https://arxiv.org/abs/2408.14320
+[[paper]](https://arxiv.org/abs/2408.14320)
 
 ## Scripts
 Jupyter notebooks and Python scripts for project setup and execution.
